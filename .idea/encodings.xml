@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/androidtest/Config.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/androidtest/Joystick.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/androidtest/Pce.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/androidtest/Sound.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Config.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/ExecuteCounter.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/GFont.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Joystick.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Main.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/PSGi.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Pce.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Render.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/SDbinding.java" charset="windows-31j" />
+    <file url="file://$PROJECT_DIR$/app/src/test/java/ixpce/Sound.java" charset="windows-31j" />
+  </component>
+</project>
