@@ -64,11 +64,13 @@ public class Render {
 		int i;
 		int start = offYPce * Pce.WIDTH + offXPce;
 		int end = heightPce * Pce.WIDTH;
-		int renderOffX = (screenWidth - widthPce) / 2;
-		int renderOffY = (screenHeight - heightPce) / 2;
+		//int renderOffX = (screenWidth - widthPce) / 2;
+		//int renderOffY = (screenHeight - heightPce) / 2;
+		int renderOffY = 0;
 		for (i = start; i < end; i += Pce.WIDTH, renderOffY++) {
 			//g.setPixels(renderOffX, renderOffY, widthPce, 1, buffer, i);
-			bitmap.setPixels(buffer, i, widthPce, renderOffX, renderOffY, widthPce, 1);
+			//bitmap.setPixels(buffer, i, widthPce, renderOffX, renderOffY, widthPce, 1);
+			bitmap.setPixels(buffer, i, widthPce, 0, renderOffY, widthPce, 1);
 		}
 		//bitmap.setPixels(buffer, 0, widthPce, 0, 0, widthPce, heightPce);
 	}

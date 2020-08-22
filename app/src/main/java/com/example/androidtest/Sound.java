@@ -3,16 +3,19 @@ package com.example.androidtest;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class Sound extends TimerTask {
+class Sound { //extends TimerTask {
 
 	private IO	io;
 	private M6502 M;
 	private Timer timer;
-	private AudioTrack[] audioTracks = new AudioTrack[6];
+//	private AudioTrack[] audioTracks = new AudioTrack[6];
+	private AudioTrack audioTrack;
 
 	private int snd_dwSampleRate;
 	private int soundBufferMs = 1000;
@@ -38,6 +41,10 @@ class Sound extends TimerTask {
 	private int baseClockDiv50;
 	private int bufferSampleNum;
 	public String debugMsg = "";
+
+	public static final int SOUND_BUFFER_SIZE = 2048;
+	private short[] soundBuf = new short[SOUND_BUFFER_SIZE];
+	private short[] soundBufWork = new short[SOUND_BUFFER_SIZE];
 
 	//private int span;
 
@@ -66,39 +73,48 @@ class Sound extends TimerTask {
 		this.soundBufferMs = soundBufferMs;
 
 		// AudioTrackのリングバッファサイズを取得
-		//int bufferSize = sampleRate * soundBufferMs / 1000 * 100;
-		int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT) * 10;
+		int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-		// 6チャンネル分のAutdioTrackを生成する
-		for (int ch = 0; ch < 6; ch++) {
-			this.audioTracks[ch] = new AudioTrack(
-					AudioManager.STREAM_MUSIC,
-					sampleRate,
-					AudioFormat.CHANNEL_OUT_MONO,
-					AudioFormat.ENCODING_PCM_16BIT,
-					bufferSize,
-					AudioTrack.MODE_STREAM);
-
-//			//コールバック通知先の指定
-//			this.audioTracks[ch].setPlaybackPositionUpdateListener(this);
-//
-//			//1024フレーム分再生ごとに通知をおこなう
-//			this.audioTracks[ch].setPositionNotificationPeriod(1024);
-
-			this.audioTracks[ch].play();
+		// 最低200ms分のバッファになるようにbufSizeを調整
+		if(bufferSize < SOUND_BUFFER_SIZE * 2 * 2) {
+			// バッファサイズを調整
+			bufferSize = SOUND_BUFFER_SIZE * 2 * 2;
 		}
-//		pcm = PcmAudioHandler.getPCMHandler(Mode);
-//		pcm.setSampleRate(snd_dwSampleRate);
-//		pcm.setVolume(volume);
 
-//		if (timer != null) {
-//			timer.purge();
-//			///timer.setListener(null);
-//		}
+		this.audioTrack = new AudioTrack(
+				AudioManager.STREAM_MUSIC,
+				sampleRate,
+				AudioFormat.CHANNEL_OUT_MONO,
+				AudioFormat.ENCODING_PCM_16BIT,
+				bufferSize,
+				AudioTrack.MODE_STREAM);
 
-//		timer.setTime(soundBufferMs);
-//		timer.setListener(this);
-//		timer.setRepeat(true);
+		// コールバック通知先の指定
+		audioTrack.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
+			@Override
+			public void onMarkerReached(AudioTrack track) {
+				Log.d("Sound", "onMarkerReached: ");
+			}
+
+			@Override
+			public void onPeriodicNotification(AudioTrack track) {
+				Log.d("Sound", "onPeriodicNotification: ");
+				// 波形データを用意する
+				getSoundBytes();
+				// AudioTrackに書き込む
+				audioTrack.write(soundBuf, 0, soundBuf.length);
+			}
+		});
+
+		// 2048フレーム分再生ごとに通知をおこなう
+		this.audioTrack.setPositionNotificationPeriod(2048);
+
+		// AudioTrackのバッファを埋める
+		// よくわからないが、これをしておかないと100msごとのイベントが発生しない。
+		int ret;
+		do {
+			ret = audioTrack.write(soundBuf, 0, soundBuf.length);
+		} while(ret == soundBuf.length);
 
 		sbuf = new short[6][sampleRate * soundBufferMs / 1000];
 
@@ -106,92 +122,10 @@ class Sound extends TimerTask {
 		baseClockDiv50 = Pce.BaseClock / 50;
 		bufferSampleNum = snd_dwSampleRate * soundBufferMs / 1000;
 
-		//span = snd_dwSampleRate * soundBufferMs / 20 / 1000;
-
 		if (Config.APUEnable) {
-			timer.scheduleAtFixedRate(this, 0, soundBufferMs / 2);
-			//timer.start();
+			this.audioTrack.play();
 		}
 	}
-
-//	/**
-//	 * サウンド再生を停止します。
-//	 */
-//	public void stopSound() {
-//		if (timer != null) {
-//			timer.purge();
-//		}
-//	}
-
-//	/**
-//	 * サウンド再生を開始します。
-//	 */
-//	public void startSound() {
-//		if (Config.APUEnable) {
-//			if (timer != null) {
-//				//timer.start();
-//			}
-//		}
-//	}
-
-//	/**
-//	 * サウンド再生処理を破棄します。
-//	 */
-//	public void trashSound() {
-//		timer.purge();
-//	}
-
-//	/**
-//	 * PCMをサウンドバッファに書き込みます。
-//	 * @return
-//	 */
-//	public void writePCMBuffer() {
-//
-//		if (!Config.APUEnable) {
-//			return;
-//		}
-//
-//		for (int i = 0; i < 6; i++) {
-//			writeSoundData(sbuf[i], i, sbuf[i].length);
-//		}
-//
-//		// 各PSGチャネルのバッファを0番のバッファへミックスします。
-//		mixBuffer(sbuf, sbuf[0].length);
-//
-//		// サウンドバッファの書き込み位置を初期化します。
-//		for (int i = 0; i < dwOldPos.length; i++) {
-//			dwOldPos[i] = 0;
-//		}
-//	}
-
-//	/**
-//	 * サウンドバッファを加算してミックスします。
-//	 * @param buf
-//	 * @param size
-//	 */
-//	private void mixBuffer(short[][] buf, int size) {
-//		short[] buf0 = buf[0];
-//		short[] buf1 = buf[1];
-//		short[] buf2 = buf[2];
-//		short[] buf3 = buf[3];
-//		short[] buf4 = buf[4];
-//		short[] buf5 = buf[5];
-//		int size1 = size & ~3;
-//
-//		for (int i = 0; i < size1;) {
-//			buf0[i] += (buf1[i] + buf2[i] + buf3[i] + buf4[i] + buf5[i]);
-//			i++;
-//			buf0[i] += (buf1[i] + buf2[i] + buf3[i] + buf4[i] + buf5[i]);
-//			i++;
-//			buf0[i] += (buf1[i] + buf2[i] + buf3[i] + buf4[i] + buf5[i]);
-//			i++;
-//			buf0[i] += (buf1[i] + buf2[i] + buf3[i] + buf4[i] + buf5[i]);
-//			i++;
-//		}
-//		for (int i = size1; i < size; i++) {
-//			buf0[i] += buf1[i] + buf2[i] + buf3[i] + buf4[i] + buf5[i];
-//		}
-//	}
 
 	public void writePSG(int ch) {
 		int Cycle;
@@ -222,29 +156,29 @@ class Sound extends TimerTask {
 		}
 	}
 
-//	private void writeSoundData(short[] buf, int ch, int dwSize) {
-//		int dwNewPos;
-//
-//		dwNewPos = dwSize;
-//		if (dwOldPos[ch] < dwNewPos) {
-//			writeBuffer(dwOldPos[ch], ch, dwNewPos - dwOldPos[ch]);
-//		}
-//
-//		CycleOld = M.User;
-//		System.arraycopy(sbuf[ch], 0, buf, 0, dwSize);
-//		if (dwOldPos[ch] >= dwNewPos) {
-//			if (dwOldPos[ch] >= snd_dwSampleRate*soundBufferMs / (1000 * 100 / 95)) {
-//				int size = snd_dwSampleRate*soundBufferMs / 4 / 1000;
-//				System.arraycopy(sbuf[ch], dwNewPos, sbuf[ch], 0, size);
-//				dwOldPos[ch] = size;
-//			} else {
-//				System.arraycopy(sbuf[ch], dwNewPos, sbuf[ch], 0, dwOldPos[ch] - dwNewPos);
-//				dwOldPos[ch] = dwOldPos[ch] - dwNewPos;
-//			}
-//		} else {
-//			dwOldPos[ch] = 0;
-//		}
-//	}
+	private void writeSoundData(short[] buf, int ch, int dwSize) {
+		int dwNewPos;
+
+		dwNewPos = dwSize;
+		if (dwOldPos[ch] < dwNewPos) {
+			writeBuffer(dwOldPos[ch], ch, dwNewPos - dwOldPos[ch]);
+		}
+
+		CycleOld = M.User;
+		System.arraycopy(sbuf[ch], 0, buf, 0, dwSize);
+		if (dwOldPos[ch] >= dwNewPos) {
+			if (dwOldPos[ch] >= snd_dwSampleRate*soundBufferMs / (1000 * 100 / 95)) {
+				int size = snd_dwSampleRate*soundBufferMs / 4 / 1000;
+				System.arraycopy(sbuf[ch], dwNewPos, sbuf[ch], 0, size);
+				dwOldPos[ch] = size;
+			} else {
+				System.arraycopy(sbuf[ch], dwNewPos, sbuf[ch], 0, dwOldPos[ch] - dwNewPos);
+				dwOldPos[ch] = dwOldPos[ch] - dwNewPos;
+			}
+		} else {
+			dwOldPos[ch] = 0;
+		}
+	}
 
 	private void writeBuffer(int index, int ch, int dwSize) {
 		final short[] buf = sbuf[ch];
@@ -312,23 +246,16 @@ class Sound extends TimerTask {
 		}
 	}
 
-	@Override
-	public void run() {
+	public void getSoundBytes() {
 
-		// サウンドバッファのデータをaudioTrackに書き込む
+		Arrays.fill(soundBuf, (short)0);
 		for (int ch = 0; ch < 6; ch++) {
-			audioTracks[ch].write(sbuf[ch], 0, dwOldPos[ch], AudioTrack.WRITE_NON_BLOCKING);
-			// バッファの位置を初期化
-			dwOldPos[ch] = 0;
-		}
-	}
+			writeSoundData(soundBufWork, ch, SOUND_BUFFER_SIZE);
 
-	public void writeAudioTrack() {
-		// サウンドバッファのデータをaudioTrackに書き込む
-		for (int ch = 0; ch < 6; ch++) {
-			audioTracks[ch].write(sbuf[ch], 0, dwOldPos[ch], AudioTrack.WRITE_NON_BLOCKING);
-			// バッファの位置を初期化
-			dwOldPos[ch] = 0;
+			// サウンドのミックス処理
+			for (int n = 0; n < SOUND_BUFFER_SIZE; n++) {
+				soundBuf[n] += soundBufWork[n];
+			}
 		}
 	}
 }

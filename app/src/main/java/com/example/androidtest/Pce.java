@@ -2,6 +2,7 @@ package com.example.androidtest;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -576,9 +577,15 @@ class Pce {
 				RefreshScreen();
 			}
 
-			// サウンド再生
-			//audio.doFrame();
-			//sound.writeAudioTrack();
+//			Log.d("AIXPCE", "PCE Sound BUFFER : " + sound.getStatusMsg());
+//
+//			// サウンド再生
+//			//audio.doFrame();
+//			for (int i = 0; i < 6; i++) {
+//				sound.writePSG(i);
+//			}
+//			Log.d("AIXPCE", "PCE Sound BUFFER : " + sound.getStatusMsg());
+//			sound.writeAudioTrack();
 
 			if (Config.sleepEnable) {
 				// 1/60秒のタイミングを待ってスリープする

@@ -48,7 +48,7 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
         //Config.load()
         audio.init()
 
-        romFileName = "071.PCE"
+        romFileName = "rtype1.pce"
         pce.InitPCE(romFileName, "", context)
         pce.ResetPCE(cpu)
 
@@ -142,8 +142,21 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
                     ppuTimeSum = 0L;
                 }
 
-                val srcRect = Rect(0, 0, width.toInt(), height.toInt())
-                val dstRect = Rect(0, 0, width.toInt() * 3, height.toInt() * 3)
+                val screenScaleX = width / render.bitmap.width
+                val screenScaleY = height / render.bitmap.height
+                val screenScale = if (screenScaleX < screenScaleY) screenScaleX else screenScaleY
+
+                val screenOffsetX = if (width > render.bitmap.width * screenScale) {
+                    ((width - render.bitmap.width * screenScale ) / 2).toInt()
+                } else 0
+                val screenOffsetY = if (height > render.bitmap.height * screenScale) {
+                    ((height - render.bitmap.height * screenScale ) / 2).toInt()
+                } else 0
+
+                val srcRect = Rect(0, 0, render.bitmap.width, render.bitmap.height)
+                val dstRect = Rect(screenOffsetX, screenOffsetY,
+                    screenOffsetX +  (render.bitmap.width * screenScale).toInt(),
+                    screenOffsetY + (render.bitmap.height * screenScale).toInt())
 
                 canvas.drawBitmap(render.bitmap, srcRect, dstRect, null)
 
