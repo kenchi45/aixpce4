@@ -27,6 +27,7 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
     private var width = 0f
     private var height = 0f
     private val paint = Paint()
+    private var keyState = 0;
 
     override fun surfaceChanged(
         holder: SurfaceHolder,
@@ -48,7 +49,7 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
         //Config.load()
         audio.init()
 
-        romFileName = "rtype1.pce"
+        romFileName = "071.PCE"
         pce.InitPCE(romFileName, "", context)
         pce.ResetPCE(cpu)
 
@@ -101,19 +102,6 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
                 // キー状態を取得
                 // TODO: キー入力
                 val keyState: Int = 0;//getKeypadState()
-
-                // PAD以外のキー入力された場合の処理
-//            if (keyState and com.example.androidtest.Config.keyMenu != 0 && !isMenuCanceled) {
-//                dispMenu(g)
-//            } else if (keyState and com.example.androidtest.Config.keyPadSetting != 0 && !isMenuCanceled) {
-//                dispPadSetting(g)
-//            } else if (keyState and com.example.androidtest.Config.keyStateSave != 0 && nessageCount == 0) {
-//                saveState()
-//            } else if (keyState and com.example.androidtest.Config.keyStateLoad != 0 && nessageCount == 0) {
-//                loadState()
-//            } else if (keyState and com.example.androidtest.Config.keyMenu == 0) {
-//                isMenuCanceled = false
-//            }
 
                 val cpuTime = measureTimeMillis {
                     // エミュレーション実行
@@ -192,5 +180,9 @@ class SampleHolderCallBack(private val context: Context?) : SurfaceHolder.Callba
             Config.APUVolume,
             Config.APUBuffer
         )
+    }
+
+    fun callbackKeyInput(keyState: Int) {
+        joystick.state = keyState;
     }
 }

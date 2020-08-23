@@ -63,22 +63,22 @@ object Config {
      * 初期設定値を設定します。
      */
     fun setupDefault() {
-//		pad1A = (1 << Display.KEY_3);
-//		pad1B = (1 << Display.KEY_2);
-//		pad1Select = (1 << Display.KEY_5);
-//		pad1Start = (1 << Display.KEY_6);
-//		pad1Up = (1 << Display.KEY_UP);
-//		pad1Down = (1 << Display.KEY_DOWN);
-//		pad1Left = (1 << Display.KEY_LEFT);
-//		pad1Right = (1 << Display.KEY_RIGHT);
-//		keyStateSave = (1 << Display.KEY_1);
-//		keyStateLoad = (1 << Display.KEY_4);
-//		keyUp = (1 << Display.KEY_UP) | (1 << Display.KEY_RIGHT);
-//		keyDown = (1 << Display.KEY_DOWN) | (1 << Display.KEY_LEFT);
-//		keyOK = (1 << Display.KEY_SELECT);
-//		keyCancel = (1 << Display.KEY_IAPP);
-//		keyMenu = (1 << Display.KEY_SOFT1);
-//		keyPadSetting = (1 << Display.KEY_SOFT2);
+		pad1A = (1 shl 0);
+		pad1B = (1 shl 1);
+		pad1Select = (1 shl 2);
+		pad1Start = (1 shl 3);
+		pad1Up = (1 shl 4);
+		pad1Down = (1 shl 5);
+		pad1Left = (1 shl 6);
+		pad1Right = (1 shl 7);
+		keyStateSave = (1 shl 8);
+		keyStateLoad = (1 shl 9);
+		//keyUp = (1 << Display.KEY_UP) | (1 << Display.KEY_RIGHT);
+		//keyDown = (1 << Display.KEY_DOWN) | (1 << Display.KEY_LEFT);
+		//keyOK = (1 << Display.KEY_SELECT);
+		//keyCancel = (1 << Display.KEY_IAPP);
+		//keyMenu = (1 << Display.KEY_SOFT1);
+		//keyPadSetting = (1 << Display.KEY_SOFT2);
         pad1AHold = false
         pad1BHold = false
         pad1ARapid = false

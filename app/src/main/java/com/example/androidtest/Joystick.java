@@ -11,14 +11,12 @@ class Joystick {
 	public static final int JOY_LEFT = 0x80;
 	public static final int JOY_RIGHT = 0x20;
 	private int rapidCount = 0;
+	private int keyState = 0;
 
 	public int getState() {
 		int joy = 0;
 
-		// TODO: キー入力
-		int state = 0;//canvas.getKeypadState();
-		
-		state = PadRapidAndHold(state);
+		int state = PadRapidAndHold(keyState);
 		
 		if ((state & Config.pad1A) != 0) {
 			joy |= JOY_A;
@@ -79,5 +77,9 @@ class Joystick {
 		}
 		
 		return keyState;
+	}
+
+	public void setState(int state) {
+		this.keyState = state;
 	}
 }
